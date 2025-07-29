@@ -1,41 +1,41 @@
 # Define install directory
-mkdir -p ~/tools/bin
+
+mkdir -p ~/tools
 cd ~/tools
 
-# Add to PATH
-echo 'export PATH=$HOME/tools/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
+# Fastp
+module load anaconda3
+conda create -n my.anaconda python
+source activate my.anaconda
 
-# 1. Install BWA
-wget https://sourceforge.net/projects/bio-bwa/files/bwa-0.7.17.tar.bz2
-tar -xvjf bwa-0.7.17.tar.bz2
-cd bwa-0.7.17 && make
-cp bwa ../bin/
+conda install -c bioconda fastp
+
+# bwa
+conda install -c bioconda bwa
+
+# samtools
+wget https://sourceforge.net/projects/samtools/files/samtools/1.22.1/samtools-1.22.1.tar.bz2 -O samtools.tar.bz2
+tar -xjvf samtools.tar.bz2
+cd samtools-1.22.1
+make
+make prefix = $HOME/tools/samtools/bin install
+echo PATH=$PATH:$HOME/tools/samtools/bin/bin >> ~/bash_profile
+source ~/.bash_profile
 cd ..
 
-# 2. Install Samtools
-wget https://github.com/samtools/samtools/releases/download/1.18/samtools-1.18.tar.bz2
-tar -xvjf samtools-1.18.tar.bz2
-cd samtools-1.18
-./configure --prefix=$HOME/tools && make && make install
+# bcftools
+wget https://sourceforge.net/projects/samtools/files/samtools/1.22/bcftools-1.22.tar.bz2 -O bcftools.tar.bz2
+tar -xjvf bcftools.tar.bz2
+cd bcftools-1.22
+make
+make prefix =$HOME/tools/bcftools/bin install
+echo PATH=$PATH:$HOME/tools/bcftools/bin/bin >> ~/.bash_profile
+source ~/.bash_profile
 cd ..
 
-# 3. Install bcftools
-wget https://github.com/samtools/bcftools/releases/download/1.20/bcftools-1.20.tar.bz2
-tar -xvjf bcftools-1.20.tar.bz2
-cd bcftools-1.20
-make && make prefix=$HOME/tools install
-cd ..
-
-# 4. Download GATK (prebuilt Java jar)
-mkdir gatk && cd gatk
+# GATK
 wget https://github.com/broadinstitute/gatk/releases/download/4.5.0.0/gatk-4.5.0.0.zip
 unzip gatk-4.5.0.0.zip
-cp gatk-4.5.0.0/gatk $HOME/tools/bin/
+echo PATH=$PATH:$HOME/tools/gatk-4.5.0.0/ >> ~/.bash_profile
+source ~/.bash_profile
 cd ..
-
-# 5. Install fastp
-wget http://opengene.org/fastp/fastp
-chmod +x fastp
-mv fastp ~/tools/bin/
-
