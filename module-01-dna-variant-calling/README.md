@@ -4,6 +4,10 @@ This repository demonstrates a small-scale GATK single-sample variant calling pi
 
 ## 📁 Folder Structure
 
+After running `scripts/download_test_data.sh`, you will find a `data/` directory created. 
+
+You will also need to manually create an empty `results` directory under `module-01-dna-variant-calling` with the command `mkdir results` 
+
 module-01-dna-variant-calling/
 
 ├── data/ # Input FASTQs, reference genome, known variants
