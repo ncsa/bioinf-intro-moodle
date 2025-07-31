@@ -10,6 +10,9 @@ source activate my.anaconda
 
 conda install -c bioconda fastp
 
+# Trimmomatic 
+conda install -c bioconda trimmomatic
+
 # bwa
 conda install -c bioconda bwa
 
