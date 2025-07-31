@@ -16,6 +16,9 @@ conda install -c bioconda trimmomatic
 # bwa
 conda install -c bioconda bwa
 
+# minimap2
+conda install -c bioconda minimap2
+
 # samtools
 wget https://sourceforge.net/projects/samtools/files/samtools/1.22.1/samtools-1.22.1.tar.bz2 -O samtools.tar.bz2
 tar -xjvf samtools.tar.bz2
