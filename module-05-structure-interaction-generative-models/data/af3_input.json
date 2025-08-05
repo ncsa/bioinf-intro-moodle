@@ -1,0 +1,14 @@
+{
+  "fold_input": {
+    "component_0": {
+      "subunits": [
+        {
+          "sequence": "UAGUAUCAUUAGGGGUGCAAUUCAAUUUGCUGAGAGAAAGUCUACUUUCAACCCUUGAACCUGUUGGUUAGCACCAGCGUAGGAAAGUGAGCAAUAUUGAUA",
+          "molecule_type": "RNA",
+          "description": "AF269570.1/1830-1729 from ../data/RF00059.seed.sto,
+          "pair_restraints": [[15,48], [13,51], [12,52], [11,53], [10,54]]
+        }
+      ]
+    }
+  }
+}
