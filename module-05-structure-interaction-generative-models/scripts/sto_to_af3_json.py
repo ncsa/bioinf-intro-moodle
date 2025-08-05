@@ -2,7 +2,7 @@ import sys
 import json
 import random
 
-def parse_sto_to_af3_json(sto_path, output_json="af3_input.json"):
+def parse_sto_to_af3_json(sto_path, output_json="../af3_input.json"):
     seq_lines = {}
     ss_cons = ""
 
@@ -70,13 +70,16 @@ def parse_sto_to_af3_json(sto_path, output_json="af3_input.json"):
 
     # Save with indentation for readability
     with open(output_json, 'w') as f:
-	# Write all except secondary_structure nicely
+        # Write all except secondary_structure nicely
         secondary_structure = af3_json.pop("secondary_structure")
+
         json.dump(af3_json, f, indent=2)
-        f.write(",\n  \"secondary_structure\": [\n")
-        compact = ", ".join(f"[{a},{b}]" for a, b in secondary_structure)
-        f.write("    " + compact + "\n")
-        f.write("  ]\n}\n")
+
+        # Dump everything else, but suppress the final closing brace
+        f.seek(f.tell() - 2)  # back up to remove the final "\n}"
+        f.write(",\n  \"secondary_structure\": [")
+        f.write(", ".join(f"[{a},{b}]" for a, b in secondary_structure))
+        f.write("]\n}\n")
 
     print(f"Saved AlphaFold3 input to {output_json}")
 
