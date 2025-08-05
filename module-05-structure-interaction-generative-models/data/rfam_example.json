@@ -1,15 +1,14 @@
 {
-  "target": {
-    "description": "Z82044.1/19193-19300 from ../data/RF00059.seed.sto",
-    "sequence": "AAUAGUUACUGGGGGUGCCCGCUUUCGGGCUGAGAGAGAAGGCAAGCUUCUUAACCCUUUGGACCUGAUCUGGUUCGUACCAGCGUGGGGAAGUAGAGGAAUUGUUUU",
-    "molecule_type": "RNA"
-  },
-  "mode": "monomer",
-  "template_mode": "none",
-  "use_templates": false,
-  "version": "1.0"
-},
-  "secondary_structure": [
-    [15,51], [13,54], [12,55], [11,56], [10,57]
-  ]
+  "component_0": {
+    "subunits": [
+      {
+        "sequence": "UAAUGCUACUAGGGGAGCCAUAGUAAAUGGCUGAGAUGAUUAAUUCAGACCCUUAUAACCUGAUUUGGUUAGUACCAACGUAGGAAAGUAGUUAUGUAAAUGU",
+        "molecule_type": "RNA",
+        "description": "AP006716.1/943397-943499 from ../data/RF00059.seed.sto",
+        "pair_restraints": [
+  [20,76],[19,77],[18,78],[17,80],[16,81],[92,143],[91,144],[90,145],[89,146],[88,147],[15,148],[13,152],[12,153],[11,154],[10,155],[172,179],[171,180],[170,181],[169,182],[165,186],[164,187],[163,188],[162,189],[9,194],[8,195],[7,196],[6,197],[5,198]
+]
+      }
+    ]
+  }
 }

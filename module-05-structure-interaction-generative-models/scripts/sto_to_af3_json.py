@@ -2,90 +2,80 @@ import sys
 import json
 import random
 
-def parse_sto_to_af3_json(sto_path, output_json="../af3_input.json"):
-    seq_lines = {}
-    ss_cons = ""
-
-    with open(sto_path) as f:
-        for line in f:
-            if line.startswith("#=GC SS_cons"):
-                ss_cons += line.strip().split()[2]
-            elif line.startswith("#") or line.startswith("//"):
-                continue
-            elif line.strip():
-                parts = line.strip().split()
-                if len(parts) != 2:
-                    continue
-                name, seq = parts
-                if name not in seq_lines:
-                    seq_lines[name] = ""
-                seq_lines[name] += seq
-
-    sequence_ids = list(seq_lines.keys())
-    N = len(sequence_ids)
-
-    if N == 0:
-        print("No sequences found.")
-        return
-
-    pick_index = random.randint(0, N - 1)
-    chosen_id = sequence_ids[pick_index]
-    aligned_seq = seq_lines[chosen_id]
-
-
-
-    print(f"Picking out the {pick_index}th sequence out of {N} sequences: {chosen_id}")
-
-    # Remove gaps from both sequence and structure
-    ungapped_seq = ""
-    ungapped_ss = ""
-    for s, b in zip(aligned_seq, ss_cons):
-        if s != "-":
-            ungapped_seq += s
-            ungapped_ss += b
-
-    # Convert dot-bracket to 0-based base pairs
+def parse_dot_bracket(dot_bracket, verbose=True):
     stack = []
     pairs = []
-    for i, char in enumerate(ungapped_ss):
-        if char == '(':
-            stack.append(i)
-        elif char == ')':
-            j = stack.pop()
+    for i, c in enumerate(dot_bracket.strip()):
+        if c in "([{<ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            stack.append((c, i))
+        elif c in ")]}>abcdefghijklmnopqrstuvwxyz":
+            if not stack:
+                if verbose:
+                    print(f"Warning: unmatched '{c}' at position {i}")
+                continue
+            open_char, j = stack.pop()
             pairs.append([j, i])
+    return pairs
 
-    # Build AlphaFold3 input JSON
-    af3_json = {
-        "target": {
-            "description": f"{chosen_id} from {sto_path}",
-            "sequence": ungapped_seq,
-            "molecule_type": "RNA"
-        },
-        "mode": "monomer",
-        "template_mode": "none",
-        "use_templates": False,
-        "secondary_structure": pairs,
-        "version": "1.0"
+class CompactArraysEncoder(json.JSONEncoder):
+    def default(self, o):
+        return super().default(o)
+
+    def encode(self, obj):
+        json_str = super().encode(obj)
+
+        # Flatten only the "pair_restraints" array of arrays
+        import re
+        pattern = r'"pair_restraints": \[\s*(\[[^\[\]]+\](?:,\s*\[[^\[\]]+\])*)\s*\]'
+        def replacer(match):
+            flat = match.group(1).replace('\n', '').replace('  ', '')
+            return f'"pair_restraints": [\n  {flat}\n]'
+
+        return re.sub(pattern, replacer, json_str)
+
+
+def parse_sto_to_af3_json(sto_file, output_json="../data/rfam_example.json"):
+    with open(sto_file) as f:
+        lines = f.readlines()
+
+    sequence_lines = []
+    ss_cons_line = ""
+    for line in lines:
+        if not line.startswith("#") and line.strip():
+            sequence_lines.append(line.strip())
+        elif line.startswith("#=GC SS_cons"):
+            ss_cons_line = line.strip().split(maxsplit=2)[-1]
+
+    if not sequence_lines:
+        raise ValueError("No sequences found.")
+
+    N = len(sequence_lines)
+    pick_index = random.randint(0, N - 1)
+    picked_line = sequence_lines[pick_index]
+    seq_id, seq = picked_line.split(maxsplit=1)
+
+    print(f"Picking out the {pick_index}th sequence out of {N} sequences: {seq_id}")
+
+    subunit = {
+        "sequence": seq.replace('.', '').replace('-', ''),
+        "molecule_type": "RNA",
+        "description": f"{seq_id} from {sto_file}"
     }
 
-    # Save with indentation for readability
+    if ss_cons_line:
+        pair_restraints = parse_dot_bracket(ss_cons_line)
+        if pair_restraints:
+            subunit["pair_restraints"] = pair_restraints
+
+    af3_json = {
+        "component_0": {
+            "subunits": [subunit]
+        }
+    }
+
     with open(output_json, 'w') as f:
-        # Write all except secondary_structure nicely
-        secondary_structure = af3_json.pop("secondary_structure")
-
-        json.dump(af3_json, f, indent=2)
-
-        # Dump everything else, but suppress the final closing brace
-        f.seek(f.tell() - 2)  # back up to remove the final "\n}"
-        f.write(",\n  \"secondary_structure\": [")
-        f.write(", ".join(f"[{a},{b}]" for a, b in secondary_structure))
-        f.write("]\n}\n")
-
-    print(f"Saved AlphaFold3 input to {output_json}")
+        f.write(json.dumps(af3_json, indent=2, cls=CompactArraysEncoder))
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python sto_to_af3_json.py RFxxxxx.seed.sto")
-    else:
-        parse_sto_to_af3_json(sys.argv[1])
+    parse_sto_to_af3_json(sys.argv[1])
 
