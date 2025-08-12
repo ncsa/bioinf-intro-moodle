@@ -8,11 +8,14 @@
 
 set -e
 
+INVCF=../results/sample1_bcftools_raw.vcf.gz
+OUTVCF=../results/sample1_bcftools_filtered.vcf.gz
+
 bcftools filter \
   -e 'QUAL<30 || DP<10' \
   -s LOWQUAL \
-  -Oz -o ../results/sample1_bcftools_filtered.vcf.gz \
-  ../results/sample1_bcftools.vcf.gz
+  -Oz -o $OUTVCF \
+  $INVCF
 
-bcftools index ../results/sample1_bcftools_filtered.vcf.gz
+bcftools index $OUTVCF
 

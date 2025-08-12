@@ -7,8 +7,8 @@
 #SBATCH --error=gatk_var_fil.e%j
 
 # Input
-INVCF=../results/sample1_raw.vcf.gz
-OUTVCF=../results/sample1_filtered.vcf.gz
+INVCF=../results/sample1_gatk_raw.vcf.gz
+OUTVCF=../results/sample1_gatk_filtered.vcf.gz
 
 # Apply hard filters to SNPs
 gatk VariantFiltration \

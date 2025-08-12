@@ -9,7 +9,7 @@
 # Input
 REF=../data/hg38_chr20_expanded.fa
 INBAM=../results/sample1_bqsr.bam
-OUTVCF=../results/sample1_raw.vcf.gz
+OUTVCF=../results/sample1_gatk_raw.vcf.gz
 
 # Run HaplotypeCaller
 gatk HaplotypeCaller \
